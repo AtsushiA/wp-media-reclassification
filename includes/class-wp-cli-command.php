@@ -39,6 +39,12 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
      * [--all]
      * : すべてのメディアファイルを処理（バッチ処理を繰り返し実行）
      *
+     * [--log]
+     * : 処理ログをファイルに出力します
+     *
+     * [--log-file=<filename>]
+     * : ログファイル名を指定（デフォルト: reclassification-YYYY-MM-DD_HH-MM-SS.log）
+     *
      * ## EXAMPLES
      *
      *     # ドライラン（テスト実行）
@@ -50,8 +56,11 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
      *     # 特定期間のメディアを処理
      *     $ wp media reclassify --date-from=2023-01-01 --date-to=2023-12-31
      *
-     *     # すべてのメディアを処理
-     *     $ wp media reclassify --all
+     *     # すべてのメディアを処理（ログ出力あり）
+     *     $ wp media reclassify --all --log
+     *
+     *     # ログファイル名を指定
+     *     $ wp media reclassify --log --log-file=my-reclassification.log
      *
      * @when after_wp_load
      */
@@ -61,6 +70,8 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
         $date_from = isset($assoc_args['date-from']) ? $assoc_args['date-from'] : '';
         $date_to = isset($assoc_args['date-to']) ? $assoc_args['date-to'] : '';
         $process_all = isset($assoc_args['all']);
+        $enable_logging = isset($assoc_args['log']);
+        $log_file_name = isset($assoc_args['log-file']) ? $assoc_args['log-file'] : null;
 
         // 日付フォーマットのバリデーション
         if (!empty($date_from) && !$this->validate_date($date_from)) {
@@ -73,7 +84,9 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
 
         $options = array(
             'dry_run' => $dry_run,
-            'batch_size' => $batch_size
+            'batch_size' => $batch_size,
+            'enable_logging' => $enable_logging,
+            'log_file_name' => $log_file_name
         );
 
         $query_args = array();
@@ -100,10 +113,23 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
             WP_CLI::warning('ドライランモード: 実際にファイルは移動されません。');
         }
 
+        if ($enable_logging) {
+            $logger = $reclassifier->get_logger();
+            $log_file_path = $logger->get_log_file_path();
+            WP_CLI::log("ログ出力: 有効");
+            WP_CLI::log("ログファイル: {$log_file_path}");
+        }
+
         if ($process_all) {
             $this->process_all_batches($reclassifier, $query_args, $total_count, $batch_size);
         } else {
             $this->process_single_batch($reclassifier, $query_args, $batch_size);
+        }
+
+        // 処理完了後にログファイル情報を表示
+        if ($enable_logging) {
+            $logger = $reclassifier->get_logger();
+            WP_CLI::success("ログファイルが保存されました: " . $logger->get_log_file_path());
         }
     }
 

@@ -9,6 +9,7 @@
     let isProcessing = false;
     let allErrors = [];
     let allSuccess = [];
+    let logFileName = null;
 
     $(document).ready(function() {
         // 対象件数を確認
@@ -103,6 +104,7 @@
         const batchSize = parseInt($('#batch_size').val()) || 50;
         const dateFrom = $('#date_from').val();
         const dateTo = $('#date_to').val();
+        const enableLogging = $('#enable_logging').is(':checked') ? '1' : '0';
 
         $.ajax({
             url: wpMediaReclassification.ajaxUrl,
@@ -114,17 +116,24 @@
                 batch_size: batchSize,
                 offset: offset,
                 date_from: dateFrom,
-                date_to: dateTo
+                date_to: dateTo,
+                enable_logging: enableLogging
             },
             success: function(response) {
                 if (response.success) {
                     const results = response.data.results;
                     const log = response.data.log;
+                    const logFile = response.data.log_file;
 
                     processedCount += results.total;
                     successCount += results.success;
                     errorCount += results.error;
                     skippedCount += results.skipped;
+
+                    // ログファイル情報を保存
+                    if (logFile && logFile.file_name) {
+                        logFileName = logFile.file_name;
+                    }
 
                     // ログを保存
                     if (log.error && log.error.length > 0) {
@@ -192,7 +201,17 @@
             resultClass = 'notice-warning';
         }
 
-        $('#result-message').html('<div class="notice ' + resultClass + '"><p>' + resultMessage + '</p></div>');
+        let messageHtml = '<div class="notice ' + resultClass + '"><p>' + resultMessage + '</p>';
+
+        // ログファイル情報を表示
+        if (logFileName) {
+            messageHtml += '<p><strong>ログファイル:</strong> ' + logFileName + '</p>';
+            messageHtml += '<p class="description">ログファイルは wp-content/uploads/wp-media-reclassification-logs/ に保存されています。</p>';
+        }
+
+        messageHtml += '</div>';
+
+        $('#result-message').html(messageHtml);
         $('#result-container').slideDown();
 
         // エラーリストを表示

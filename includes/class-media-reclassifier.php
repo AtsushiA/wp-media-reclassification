@@ -34,11 +34,21 @@ class WP_Media_Reclassifier {
     private $batch_size = self::DEFAULT_BATCH_SIZE;
 
     /**
+     * ロガー
+     */
+    private $logger;
+
+    /**
      * コンストラクタ
      */
     public function __construct($options = array()) {
         $this->dry_run = isset($options['dry_run']) ? $options['dry_run'] : false;
         $this->batch_size = isset($options['batch_size']) ? intval($options['batch_size']) : self::DEFAULT_BATCH_SIZE;
+
+        // ロガーの初期化
+        $enable_logging = isset($options['enable_logging']) ? $options['enable_logging'] : false;
+        $log_file_name = isset($options['log_file_name']) ? $options['log_file_name'] : null;
+        $this->logger = new WP_Media_Reclassification_Logger($enable_logging, $log_file_name);
     }
 
     /**
@@ -126,6 +136,7 @@ class WP_Media_Reclassifier {
         $attachment = get_post($attachment_id);
         if (!$attachment) {
             $result['message'] = 'Attachment not found';
+            $this->logger->error('Attachment not found', array('attachment_id' => $attachment_id));
             return $result;
         }
 
@@ -133,6 +144,10 @@ class WP_Media_Reclassifier {
         $old_file_path = get_attached_file($attachment_id);
         if (!file_exists($old_file_path)) {
             $result['message'] = 'File does not exist: ' . $old_file_path;
+            $this->logger->error('File does not exist', array(
+                'attachment_id' => $attachment_id,
+                'file_path' => $old_file_path
+            ));
             return $result;
         }
 
@@ -150,6 +165,10 @@ class WP_Media_Reclassifier {
         if (strpos($old_file_path, '/' . $year . '/' . $month . '/') !== false) {
             $result['message'] = 'Already in correct folder structure';
             $result['skipped'] = true;
+            $this->logger->info('File already in correct folder structure', array(
+                'attachment_id' => $attachment_id,
+                'file_path' => $old_file_path
+            ));
             return $result;
         }
 
@@ -175,6 +194,10 @@ class WP_Media_Reclassifier {
         if (!file_exists($new_dir)) {
             if (!wp_mkdir_p($new_dir)) {
                 $result['message'] = 'Failed to create directory: ' . $new_dir;
+                $this->logger->error('Failed to create directory', array(
+                    'attachment_id' => $attachment_id,
+                    'directory' => $new_dir
+                ));
                 return $result;
             }
         }
@@ -182,6 +205,11 @@ class WP_Media_Reclassifier {
         // ファイルを移動
         if (!@rename($old_file_path, $new_file_path)) {
             $result['message'] = 'Failed to move file';
+            $this->logger->error('Failed to move file', array(
+                'attachment_id' => $attachment_id,
+                'old_path' => $old_file_path,
+                'new_path' => $new_file_path
+            ));
             return $result;
         }
 
@@ -193,6 +221,11 @@ class WP_Media_Reclassifier {
 
         if (!$update_result) {
             $result['message'] = 'File moved but failed to update database';
+            $this->logger->error('Failed to update database', array(
+                'attachment_id' => $attachment_id,
+                'old_path' => $old_file_path,
+                'new_path' => $new_file_path
+            ));
             return $result;
         }
 
@@ -201,6 +234,13 @@ class WP_Media_Reclassifier {
 
         $result['success'] = true;
         $result['message'] = 'Successfully reclassified';
+
+        // 成功ログを記録
+        $this->logger->success('Successfully reclassified media', array(
+            'attachment_id' => $attachment_id,
+            'old_path' => $old_file_path,
+            'new_path' => $new_file_path
+        ));
 
         return $result;
     }
@@ -392,5 +432,14 @@ class WP_Media_Reclassifier {
             'error' => array(),
             'skipped' => array()
         );
+    }
+
+    /**
+     * ロガーを取得
+     *
+     * @return WP_Media_Reclassification_Logger
+     */
+    public function get_logger() {
+        return $this->logger;
     }
 }

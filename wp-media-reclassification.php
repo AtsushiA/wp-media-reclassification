@@ -4,8 +4,8 @@
  * Plugin URI: https://github.com/yourusername/wp-media-reclassification
  * Description: メディアファイルを年/月のフォルダ構造に再分類します
  * Version: 1.0.0
- * Author: Your Name
- * Author URI: https://yourwebsite.com
+ * Author: NExT-Season
+ * Author URI: https://next-season.net
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wp-media-reclassification
@@ -23,6 +23,7 @@ define('WP_MEDIA_RECLASSIFICATION_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_MEDIA_RECLASSIFICATION_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // 必要なクラスファイルを読み込み
+require_once WP_MEDIA_RECLASSIFICATION_PLUGIN_DIR . 'includes/class-logger.php';
 require_once WP_MEDIA_RECLASSIFICATION_PLUGIN_DIR . 'includes/class-media-reclassifier.php';
 require_once WP_MEDIA_RECLASSIFICATION_PLUGIN_DIR . 'includes/class-admin-page.php';
 
