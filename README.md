@@ -34,6 +34,7 @@ WordPress の「メディアファイルを年月ベースのフォルダーに�
    - **バッチサイズ**: 一度に処理する件数（デフォルト: 50件）
    - **日付範囲**: 特定期間のメディアのみ処理
    - **ログ出力**: 処理ログをファイルに出力（エラー調査に有用）
+   - **エラーのみログ出力**: エラーと警告のみをログに記録（ログファイルサイズを削減）
 3. 「対象件数を確認」ボタンをクリック
 4. 「処理を開始」ボタンをクリックして実行
 5. 処理完了後、ログファイル情報が表示されます（ログ出力を有効にした場合）
@@ -58,6 +59,9 @@ wp media reclassify --all --log
 
 # ログファイル名を指定
 wp media reclassify --log --log-file=my-reclassification.log
+
+# エラーのみログに記録
+wp media reclassify --all --log --error-only
 ```
 
 ### WP-CLIコマンドオプション
@@ -69,6 +73,7 @@ wp media reclassify --log --log-file=my-reclassification.log
 - `--all`: すべてのメディアを処理
 - `--log`: 処理ログをファイルに出力
 - `--log-file=<ファイル名>`: ログファイル名を指定（デフォルト: reclassification-YYYY-MM-DD_HH-MM-SS.log）
+- `--error-only`: エラーと警告のみをログに記録（ログファイルサイズを削減）
 
 ## 注意事項
 
@@ -112,6 +117,7 @@ wp media reclassify --log --log-file=my-reclassification.log
 - **ファイル名**: `reclassification-YYYY-MM-DD_HH-MM-SS.log`（カスタマイズ可能）
 - **セキュリティ**: `.htaccess`で直接アクセスを制限
 - **ログレベル**: ERROR（エラー）、WARNING（警告）、INFO（情報）、SUCCESS（成功）
+- **エラーのみモード**: エラーと警告のみを記録してログファイルサイズを削減可能
 
 ### ログに記録される情報
 

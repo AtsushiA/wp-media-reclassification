@@ -45,6 +45,9 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
      * [--log-file=<filename>]
      * : ログファイル名を指定（デフォルト: reclassification-YYYY-MM-DD_HH-MM-SS.log）
      *
+     * [--error-only]
+     * : エラーと警告のみをログに記録します（ログファイルサイズを削減）
+     *
      * ## EXAMPLES
      *
      *     # ドライラン（テスト実行）
@@ -62,6 +65,9 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
      *     # ログファイル名を指定
      *     $ wp media reclassify --log --log-file=my-reclassification.log
      *
+     *     # エラーのみログに記録
+     *     $ wp media reclassify --all --log --error-only
+     *
      * @when after_wp_load
      */
     public function __invoke($args, $assoc_args) {
@@ -72,6 +78,7 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
         $process_all = isset($assoc_args['all']);
         $enable_logging = isset($assoc_args['log']);
         $log_file_name = isset($assoc_args['log-file']) ? $assoc_args['log-file'] : null;
+        $error_only = isset($assoc_args['error-only']);
 
         // 日付フォーマットのバリデーション
         if (!empty($date_from) && !$this->validate_date($date_from)) {
@@ -86,7 +93,8 @@ class WP_Media_Reclassification_CLI_Command extends WP_CLI_Command {
             'dry_run' => $dry_run,
             'batch_size' => $batch_size,
             'enable_logging' => $enable_logging,
-            'log_file_name' => $log_file_name
+            'log_file_name' => $log_file_name,
+            'error_only' => $error_only
         );
 
         $query_args = array();

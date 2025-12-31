@@ -48,7 +48,8 @@ class WP_Media_Reclassifier {
         // ロガーの初期化
         $enable_logging = isset($options['enable_logging']) ? $options['enable_logging'] : false;
         $log_file_name = isset($options['log_file_name']) ? $options['log_file_name'] : null;
-        $this->logger = new WP_Media_Reclassification_Logger($enable_logging, $log_file_name);
+        $error_only = isset($options['error_only']) ? $options['error_only'] : false;
+        $this->logger = new WP_Media_Reclassification_Logger($enable_logging, $log_file_name, $error_only);
     }
 
     /**

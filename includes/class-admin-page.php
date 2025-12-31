@@ -149,6 +149,15 @@ class WP_Media_Reclassification_Admin_Page {
                                 <p class="description">処理ログをファイルに出力します（エラー調査に有用）</p>
                             </td>
                         </tr>
+                        <tr>
+                            <th scope="row">
+                                <label for="error_only">エラーのみログ出力</label>
+                            </th>
+                            <td>
+                                <input type="checkbox" id="error_only" name="error_only" value="1">
+                                <p class="description">エラーと警告のみをログに記録します（ログファイルサイズを削減）</p>
+                            </td>
+                        </tr>
                     </table>
 
                     <p class="submit">
@@ -350,11 +359,13 @@ class WP_Media_Reclassification_Admin_Page {
         $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
         $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
         $enable_logging = isset($_POST['enable_logging']) && $_POST['enable_logging'] === '1';
+        $error_only = isset($_POST['error_only']) && $_POST['error_only'] === '1';
 
         $options = array(
             'dry_run' => $dry_run,
             'batch_size' => $batch_size,
-            'enable_logging' => $enable_logging
+            'enable_logging' => $enable_logging,
+            'error_only' => $error_only
         );
 
         $args = array(

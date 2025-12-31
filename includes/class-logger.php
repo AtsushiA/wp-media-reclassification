@@ -20,6 +20,11 @@ class WP_Media_Reclassification_Logger {
     private $enabled;
 
     /**
+     * エラーのみログに記録するか
+     */
+    private $error_only;
+
+    /**
      * ログレベル
      */
     const LEVEL_ERROR = 'ERROR';
@@ -32,9 +37,11 @@ class WP_Media_Reclassification_Logger {
      *
      * @param bool $enabled ログを有効にするか
      * @param string $log_file_name ログファイル名（オプション）
+     * @param bool $error_only エラーのみ記録するか（オプション）
      */
-    public function __construct($enabled = false, $log_file_name = null) {
+    public function __construct($enabled = false, $log_file_name = null, $error_only = false) {
         $this->enabled = $enabled;
+        $this->error_only = $error_only;
 
         if ($this->enabled) {
             $upload_dir = wp_upload_dir();
@@ -99,6 +106,11 @@ class WP_Media_Reclassification_Logger {
      */
     public function log($level, $message, $context = array()) {
         if (!$this->enabled || !$this->log_file_path) {
+            return;
+        }
+
+        // エラーのみモードの場合、エラーと警告以外はスキップ
+        if ($this->error_only && $level !== self::LEVEL_ERROR && $level !== self::LEVEL_WARNING) {
             return;
         }
 

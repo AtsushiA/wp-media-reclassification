@@ -105,6 +105,7 @@
         const dateFrom = $('#date_from').val();
         const dateTo = $('#date_to').val();
         const enableLogging = $('#enable_logging').is(':checked') ? '1' : '0';
+        const errorOnly = $('#error_only').is(':checked') ? '1' : '0';
 
         $.ajax({
             url: wpMediaReclassification.ajaxUrl,
@@ -117,7 +118,8 @@
                 offset: offset,
                 date_from: dateFrom,
                 date_to: dateTo,
-                enable_logging: enableLogging
+                enable_logging: enableLogging,
+                error_only: errorOnly
             },
             success: function(response) {
                 if (response.success) {
