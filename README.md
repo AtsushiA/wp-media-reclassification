@@ -1,4 +1,4 @@
-# WP Media Reclassification
+# NExT WP Media Reclassification
 
 WordPressメディアライブラリのファイルを年/月のフォルダ構造に再分類するプラグインです。
 
@@ -156,6 +156,14 @@ wp media reclassify --all --log --error-only
 GPL v2 or later
 
 ## 変更履歴
+
+### 1.1.0
+- セキュリティ修正: `$_POST`/`$_GET` 処理に `wp_unslash()` を追加
+- セキュリティ修正: バッチサイズのサーバーサイドバリデーション追加（1〜500）
+- セキュリティ修正: 日付フォーマットのサーバーサイドバリデーション追加
+- セキュリティ修正: ログファイルダウンロード時の `Content-Disposition` ヘッダーを `rawurlencode()` でエンコード
+- セキュリティ修正: `rename()` のエラー抑制演算子（`@`）を除去
+- `uninstall.php` を追加してプラグイン削除時のクリーンアップを実装
 
 ### 1.0.0
 - 初回リリース

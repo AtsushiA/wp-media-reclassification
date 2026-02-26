@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: WP Media Reclassification
+ * Plugin Name: NExT WP Media Reclassification
  * Plugin URI: https://github.com/yourusername/wp-media-reclassification
  * Description: メディアファイルを年/月のフォルダ構造に再分類します
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: NExT-Season
  * Author URI: https://next-season.net
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // プラグイン定数の定義
-define('WP_MEDIA_RECLASSIFICATION_VERSION', '1.0.0');
+define('WP_MEDIA_RECLASSIFICATION_VERSION', '1.1.0');
 define('WP_MEDIA_RECLASSIFICATION_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_MEDIA_RECLASSIFICATION_PLUGIN_URL', plugin_dir_url(__FILE__));
 
