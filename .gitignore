@@ -1,0 +1,29 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ・IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Composer
+vendor/
+
+# WordPress
+*.log
+wp-content/uploads/
+
+# ビルド成果物
+/dist/
+/build/
+
+# 環境設定
+.env
+.env.local
