@@ -323,8 +323,15 @@ class WP_Media_Reclassification_Admin_Page {
             wp_send_json_error('権限がありません。');
         }
 
-        $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
-        $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
+        $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
+        $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
+
+        if (!empty($date_from) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_from)) {
+            wp_send_json_error('date_from の形式が正しくありません。YYYY-MM-DD形式で指定してください。');
+        }
+        if (!empty($date_to) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to)) {
+            wp_send_json_error('date_to の形式が正しくありません。YYYY-MM-DD形式で指定してください。');
+        }
 
         $args = array();
         if (!empty($date_from)) {
@@ -353,13 +360,20 @@ class WP_Media_Reclassification_Admin_Page {
         // タイムアウトを延長
         set_time_limit(300);
 
-        $dry_run = isset($_POST['dry_run']) && $_POST['dry_run'] === '1';
-        $batch_size = isset($_POST['batch_size']) ? intval($_POST['batch_size']) : 50;
-        $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
-        $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
-        $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
-        $enable_logging = isset($_POST['enable_logging']) && $_POST['enable_logging'] === '1';
-        $error_only = isset($_POST['error_only']) && $_POST['error_only'] === '1';
+        $dry_run = isset($_POST['dry_run']) && wp_unslash($_POST['dry_run']) === '1';
+        $batch_size = isset($_POST['batch_size']) ? max(1, min(500, intval(wp_unslash($_POST['batch_size'])))) : 50;
+        $offset = isset($_POST['offset']) ? max(0, intval(wp_unslash($_POST['offset']))) : 0;
+        $date_from = isset($_POST['date_from']) ? sanitize_text_field(wp_unslash($_POST['date_from'])) : '';
+        $date_to = isset($_POST['date_to']) ? sanitize_text_field(wp_unslash($_POST['date_to'])) : '';
+        $enable_logging = isset($_POST['enable_logging']) && wp_unslash($_POST['enable_logging']) === '1';
+        $error_only = isset($_POST['error_only']) && wp_unslash($_POST['error_only']) === '1';
+
+        if (!empty($date_from) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_from)) {
+            wp_send_json_error('date_from の形式が正しくありません。YYYY-MM-DD形式で指定してください。');
+        }
+        if (!empty($date_to) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to)) {
+            wp_send_json_error('date_to の形式が正しくありません。YYYY-MM-DD形式で指定してください。');
+        }
 
         $options = array(
             'dry_run' => $dry_run,
@@ -410,7 +424,7 @@ class WP_Media_Reclassification_Admin_Page {
             wp_send_json_error('権限がありません。');
         }
 
-        $file_name = isset($_POST['file_name']) ? sanitize_file_name($_POST['file_name']) : '';
+        $file_name = isset($_POST['file_name']) ? sanitize_file_name(wp_unslash($_POST['file_name'])) : '';
 
         if (empty($file_name)) {
             wp_send_json_error('ファイル名が指定されていません。');
@@ -448,8 +462,8 @@ class WP_Media_Reclassification_Admin_Page {
             wp_die('権限がありません。');
         }
 
-        $file_name = isset($_GET['file']) ? sanitize_file_name($_GET['file']) : '';
-        $nonce = isset($_GET['nonce']) ? $_GET['nonce'] : '';
+        $file_name = isset($_GET['file']) ? sanitize_file_name(wp_unslash($_GET['file'])) : '';
+        $nonce = isset($_GET['nonce']) ? wp_unslash($_GET['nonce']) : '';
 
         if (empty($file_name)) {
             wp_die('ファイル名が指定されていません。');
@@ -467,8 +481,8 @@ class WP_Media_Reclassification_Admin_Page {
             wp_die('ログファイルが見つかりません。');
         }
 
-        header('Content-Type: text/plain');
-        header('Content-Disposition: attachment; filename="' . $file_name . '"');
+        header('Content-Type: text/plain; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . rawurlencode($file_name) . '"');
         header('Content-Length: ' . filesize($file_path));
         readfile($file_path);
         exit;

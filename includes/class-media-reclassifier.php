@@ -204,7 +204,7 @@ class WP_Media_Reclassifier {
         }
 
         // ファイルを移動
-        if (!@rename($old_file_path, $new_file_path)) {
+        if (!rename($old_file_path, $new_file_path)) {
             $result['message'] = 'Failed to move file';
             $this->logger->error('Failed to move file', array(
                 'attachment_id' => $attachment_id,
@@ -297,7 +297,7 @@ class WP_Media_Reclassifier {
             if (file_exists($old_thumb_path)) {
                 // 重複チェック
                 $new_thumb_path = $this->get_unique_filename($new_thumb_path);
-                @rename($old_thumb_path, $new_thumb_path);
+                rename($old_thumb_path, $new_thumb_path);
             }
         }
     }
